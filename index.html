@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Work &amp; Move</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    #app { width: 100%; max-width: 420px; }
+
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 2px; }
+    .subtitle { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+
+    .nav-tabs {
+      display: flex;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .nav-tab {
+      flex: 1; padding: 9px;
+      font-size: 14px; border: none;
+      background: #fff; color: #888;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .nav-tab.active { background: #f0f0ea; color: #1a1a1a; font-weight: 600; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e5e0;
+      border-radius: 16px;
+      padding: 1.5rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .timer-label {
+      font-size: 12px; color: #888;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 8px; text-align: center;
+    }
+    .timer-display {
+      font-size: 64px; font-weight: 600;
+      text-align: center; letter-spacing: -3px;
+      line-height: 1; margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-sub { font-size: 13px; color: #888; text-align: center; }
+
+    .progress-bar {
+      height: 5px; background: #f0f0ea;
+      border-radius: 3px; margin: 1rem 0 0; overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 1s linear; }
+    .focus-fill { background: #534AB7; }
+    .break-fill { background: #0F6E56; }
+
+    .play-btn {
+      width: 68px; height: 68px; border-radius: 50%;
+      border: 1px solid #ddd; background: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      margin: 1.25rem auto 0;
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .play-btn:hover { background: #f5f5f0; }
+    .play-btn:active { transform: scale(0.95); }
+    .play-btn svg { width: 30px; height: 30px; fill: #1a1a1a; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .chore-tag {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 3px 9px; border-radius: 8px; margin-bottom: 10px;
+    }
+    .tag-chore { background: #E6F1FB; color: #0C447C; }
+    .tag-exercise { background: #E1F5EE; color: #085041; }
+
+    .chore-name { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+    .chore-last { font-size: 13px; color: #888; }
+
+    .btn-row {
+      display: flex; gap: 10px; align-items: center; margin-top: 0.5rem;
+    }
+    .skip-btn {
+      flex: 1; padding: 12px;
+      border-radius: 10px; border: 1px solid #ddd;
+      background: #fff; color: #555;
+      font-size: 15px; cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .skip-btn:hover { background: #f5f5f0; }
+
+    .done-banner {
+      background: #E1F5EE; border: 1px solid #5DCAA5;
+      border-radius: 16px; padding: 1.5rem;
+      text-align: center; margin-bottom: 1rem;
+    }
+    .done-banner p { font-size: 18px; color: #085041; font-weight: 600; margin-bottom: 4px; }
+    .done-banner small { font-size: 14px; color: #0F6E56; }
+
+    .restart-btn {
+      width: 100%; padding: 14px;
+      border-radius: 12px; border: 1px solid #ddd;
+      background: #fff; color: #1a1a1a;
+      font-size: 16px; cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .restart-btn:hover { background: #f5f5f0; }
+
+    .section-title {
+      font-size: 14px; font-weight: 600;
+      color: #1a1a1a; margin: 1.25rem 0 0.75rem;
+    }
+
+    .add-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .add-row input {
+      flex: 1; padding: 10px 12px;
+      border-radius: 10px; border: 1px solid #ddd;
+      background: #fff; color: #1a1a1a;
+      font-size: 15px;
+    }
+    .add-row input:focus { outline: none; border-color: #999; }
+    .add-row select {
+      padding: 10px 8px; border-radius: 10px;
+      border: 1px solid #ddd; background: #fff;
+      color: #1a1a1a; font-size: 14px;
+    }
+    .add-row button {
+      padding: 10px 14px; border-radius: 10px;
+      border: 1px solid #ddd; background: #fff;
+      color: #1a1a1a; font-size: 15px;
+      cursor: pointer; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .add-row button:hover { background: #f5f5f0; }
+
+    .chore-list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #f0f0ea;
+      font-size: 15px;
+    }
+    .chore-list-item:last-child { border-bottom: none; }
+    .item-left { display: flex; align-items: center; gap: 8px; }
+
+    .del-btn {
+      background: none; border: none;
+      cursor: pointer; color: #bbb;
+      font-size: 16px; padding: 4px 8px;
+      border-radius: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .del-btn:hover { color: #c0392b; background: #fdf0f0; }
+
+    .empty-msg { font-size: 14px; color: #aaa; padding: 8px 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h1>Work &amp; Move</h1>
+  <p class="subtitle">Focus 25 min · then move 5 min</p>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('timer')">Timer</button>
+    <button class="nav-tab" onclick="showTab('manage')">Manage list</button>
+  </div>
+
+  <div id="tab-timer">
+
+    <div id="screen-focus" class="screen active">
+      <div class="card">
+        <div class="timer-label">Focus session</div>
+        <div class="timer-display" id="focus-display">25:00</div>
+        <div class="timer-sub">Stay on task</div>
+        <div class="progress-bar">
+          <div class="progress-fill focus-fill" id="focus-progress" style="width:100%"></div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <button class="play-btn" id="focus-play-btn" onclick="startFocus()">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="screen-break" class="screen">
+      <div id="chore-card" class="card"></div>
+      <div class="card" style="margin-bottom:0.5rem">
+        <div class="timer-label">Break timer</div>
+        <div class="timer-display" id="break-display">5:00</div>
+        <div class="progress-bar">
+          <div class="progress-fill break-fill" id="break-progress" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="skip-btn" onclick="skipChore()">Skip →</button>
+        <button class="play-btn" id="break-play-btn" onclick="startBreak()" style="margin:0;flex-shrink:0">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="screen-done" class="screen">
+      <div class="done-banner">
+        <p>Round complete!</p>
+        <small>Great work. Ready for another?</small>
+      </div>
+      <button class="restart-btn" onclick="resetAll()">Start new round</button>
+    </div>
+
+  </div>
+
+  <div id="tab-manage" style="display:none">
+    <p class="section-title">Add item</p>
+    <div class="add-row">
+      <input type="text" id="new-item-name" placeholder="e.g. 10 push-ups" />
+      <select id="new-item-type">
+        <option value="chore">Chore</option>
+        <option value="exercise">Exercise</option>
+      </select>
+      <button onclick="addItem()">Add</button>
+    </div>
+    <p class="section-title">All items</p>
+    <div class="card" style="padding:0.25rem 1.25rem">
+      <div id="chore-list-render"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_ITEMS = [
+  {name:"Wipe counters",type:"chore"},
+  {name:"Take out trash",type:"chore"},
+  {name:"Sweep floor",type:"chore"},
+  {name:"Clean bathroom sink",type:"chore"},
+  {name:"Tidy a room",type:"chore"},
+  {name:"Unload dishwasher",type:"chore"},
+  {name:"Water plants",type:"chore"},
+  {name:"Wipe stovetop",type:"chore"},
+  {name:"10 push-ups",type:"exercise"},
+  {name:"20 squats",type:"exercise"},
+  {name:"1-min plank",type:"exercise"},
+  {name:"15 lunges",type:"exercise"},
+  {name:"20 jumping jacks",type:"exercise"},
+  {name:"10 sit-ups",type:"exercise"},
+  {name:"Wall sit 45 sec",type:"exercise"},
+  {name:"Stretch routine",type:"exercise"}
+];
+
+let items = [];
+let focusInterval = null, breakInterval = null;
+let focusSecsLeft = 25 * 60, breakSecsLeft = 5 * 60;
+let skippedSet = new Set();
+let activeChore = null;
+
+function loadItems() {
+  try {
+    const s = localStorage.getItem('wam_items');
+    items = s ? JSON.parse(s) : DEFAULT_ITEMS.map(i => ({...i, lastDone: 0}));
+  } catch(e) {
+    items = DEFAULT_ITEMS.map(i => ({...i, lastDone: 0}));
+  }
+}
+
+function saveItems() {
+  try { localStorage.setItem('wam_items', JSON.stringify(items)); } catch(e) {}
+}
+
+function getSortedChores() {
+  return [...items].sort((a, b) => (a.lastDone || 0) - (b.lastDone || 0));
+}
+
+function fmt(s) {
+  return Math.floor(s / 60).toString().padStart(2, '0') + ':' + (s % 60).toString().padStart(2, '0');
+}
+
+function timeSince(ts) {
+  if (!ts) return 'Never done';
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+
+function showTab(tab) {
+  document.getElementById('tab-timer').style.display = tab === 'timer' ? 'block' : 'none';
+  document.getElementById('tab-manage').style.display = tab === 'manage' ? 'block' : 'none';
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'timer') || (i === 1 && tab === 'manage'));
+  });
+  if (tab === 'manage') renderList();
+}
+
+function showScreen(id) {
+  ['screen-focus', 'screen-break', 'screen-done'].forEach(s => {
+    document.getElementById(s).classList.toggle('active', s === id);
+  });
+}
+
+function startFocus() {
+  const btn = document.getElementById('focus-play-btn');
+  if (focusInterval) {
+    clearInterval(focusInterval); focusInterval = null;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return;
+  }
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  focusInterval = setInterval(() => {
+    focusSecsLeft--;
+    document.getElementById('focus-display').textContent = fmt(focusSecsLeft);
+    document.getElementById('focus-progress').style.width = (focusSecsLeft / (25 * 60) * 100) + '%';
+    if (focusSecsLeft <= 0) {
+      clearInterval(focusInterval); focusInterval = null;
+      playBeep(3);
+      skippedSet = new Set();
+      activeChore = null;
+      showBreakScreen();
+    }
+  }, 1000);
+}
+
+function showBreakScreen() {
+  breakSecsLeft = 5 * 60;
+  document.getElementById('break-display').textContent = fmt(breakSecsLeft);
+  document.getElementById('break-progress').style.width = '100%';
+  document.getElementById('break-play-btn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  renderChore();
+  showScreen('screen-break');
+}
+
+function renderChore() {
+  const sorted = getSortedChores();
+  const avail = sorted.filter((_, i) => !skippedSet.has(i));
+  const card = document.getElementById('chore-card');
+  if (!avail.length) {
+    activeChore = null;
+    card.innerHTML = '<div style="font-size:16px;color:#888;padding:0.25rem 0">All items skipped! Enjoy your break.</div>';
+    return;
+  }
+  activeChore = avail[0];
+  card.innerHTML = `
+    <span class="chore-tag ${activeChore.type === 'exercise' ? 'tag-exercise' : 'tag-chore'}">${activeChore.type}</span>
+    <div class="chore-name">${activeChore.name}</div>
+    <div class="chore-last">Last done: ${timeSince(activeChore.lastDone)}</div>`;
+}
+
+function skipChore() {
+  const sorted = getSortedChores();
+  const avail = sorted.filter((_, i) => !skippedSet.has(i));
+  if (!avail.length) return;
+  const skippedName = avail[0].name;
+  const globalIdx = sorted.findIndex(c => c.name === skippedName);
+  skippedSet.add(globalIdx);
+  renderChore();
+}
+
+function startBreak() {
+  const btn = document.getElementById('break-play-btn');
+  if (breakInterval) {
+    clearInterval(breakInterval); breakInterval = null;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    return;
+  }
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+  const choreToMark = activeChore ? activeChore.name : null;
+  breakInterval = setInterval(() => {
+    breakSecsLeft--;
+    document.getElementById('break-display').textContent = fmt(breakSecsLeft);
+    document.getElementById('break-progress').style.width = (breakSecsLeft / (5 * 60) * 100) + '%';
+    if (breakSecsLeft <= 0) {
+      clearInterval(breakInterval); breakInterval = null;
+      if (choreToMark) {
+        const item = items.find(i => i.name === choreToMark);
+        if (item) { item.lastDone = Date.now(); saveItems(); }
+      }
+      playBeep(1);
+      showScreen('screen-done');
+    }
+  }, 1000);
+}
+
+function resetAll() {
+  clearInterval(focusInterval); clearInterval(breakInterval);
+  focusInterval = null; breakInterval = null;
+  focusSecsLeft = 25 * 60; breakSecsLeft = 5 * 60;
+  skippedSet = new Set(); activeChore = null;
+  document.getElementById('focus-display').textContent = '25:00';
+  document.getElementById('focus-progress').style.width = '100%';
+  document.getElementById('focus-play-btn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  showScreen('screen-focus');
+  showTab('timer');
+}
+
+function addItem() {
+  const inp = document.getElementById('new-item-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  const type = document.getElementById('new-item-type').value;
+  items.push({ name, type, lastDone: 0 });
+  saveItems();
+  inp.value = '';
+  renderList();
+}
+
+function deleteItem(idx) {
+  items.splice(idx, 1);
+  saveItems();
+  renderList();
+}
+
+function renderList() {
+  const el = document.getElementById('chore-list-render');
+  if (!items.length) {
+    el.innerHTML = '<p class="empty-msg">No items yet.</p>';
+    return;
+  }
+  el.innerHTML = items.map((item, i) => `
+    <div class="chore-list-item">
+      <div class="item-left">
+        <span class="chore-tag ${item.type === 'exercise' ? 'tag-exercise' : 'tag-chore'}" style="font-size:10px;padding:2px 7px">${item.type}</span>
+        <span>${item.name}</span>
+      </div>
+      <button class="del-btn" onclick="deleteItem(${i})">✕</button>
+    </div>`).join('');
+}
+
+function playBeep(times) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < times; i++) {
+      setTimeout(() => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880; o.type = 'sine';
+        g.gain.setValueAtTime(0.4, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.6);
+      }, i * 700);
+    }
+  } catch(e) {}
+}
+
+loadItems();
+</script>
+</body>
+</html>
